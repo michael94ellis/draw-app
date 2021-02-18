@@ -8,16 +8,16 @@
                     </button>
                 </mat-card>
                 <mat-card class="users-card" *ngFor="let user of users">
-                    <mat-icon>person</mat-icon> <span class="username">{{user.username}}</span>
+                    <mat-icon>person</mat-icon> <span class="username">{{user}}</span>
                 </mat-card>
             </div>
         </mat-drawer>
         <mat-drawer-content class="chat-pane">
             <div #chatcontent [scrollTop]="scrolltop" class="chat-content">
-                <div class="message-box" *ngFor="let chat of chats">
-                    <div class="chat-status" text-center *ngIf="chat.type==='join'||chat.type==='exit';else message">
-                        <span class="chat-date">{{chat.date | date:'short'}}</span>
-                        <span class="chat-content-center">{{chat.message}}</span>
+                <div class="message-box" *ngFor="let chat of messages">
+                    <div class="chat-status" text-center *ngIf="chat.type==='join' || chat.type==='exit'; else message">
+                        <span class="chat-date">{{chat.date | date:'mediumTime' }}</span>
+                        <span class="chat-content-center">{{chat.text}}</span>
                     </div>
                     <ng-template #message>
                         <div class="chat-message">
@@ -25,8 +25,8 @@
                                 [ngClass]="{'right-bubble': chat.username === username, 'left-bubble': chat.username !== username}">
                                 <span class="msg-name" *ngIf="chat.username === username">Me</span>
                                 <span class="msg-name" *ngIf="chat.username !== username">{{chat.username}}</span>
-                                <span class="msg-date"> at {{chat.date | date:'short'}}</span>
-                                <p text-wrap>{{ chat.message }}</p>
+                                <span class="msg-date"> at {{chat.date | date:'mediumTime' }}</span>
+                                <p text-wrap>{{ chat.text }}</p>
                             </div>
                         </div>
                     </ng-template>
@@ -35,11 +35,12 @@
             <footer class="sticky-footer">
                 <form class="message-form" [formGroup]="chatForm" (ngSubmit)="onFormSubmit(chatForm.value)">
                     <mat-form-field class="message-form-field">
-                        <input matInput placeholder="Enter message here" formControlName="message"
+                        <input matInput placeholder="Enter message here" formControlName="text"
                             [errorStateMatcher]="matcher">
                         <mat-error>
-                            <span *ngIf="!chatForm.get('message')!.valid && chatForm.get('message')!.touched">Enter your
-                                message</span>
+                            <span *ngIf="!chatForm.get('text')!.valid && chatForm.get('text')!.touched">
+                                Enter your message
+                            </span>
                         </mat-error>
                         <button type="submit" [disabled]="!chatForm.valid" mat-button matSuffix mat-icon-button
                             aria-label="Send">

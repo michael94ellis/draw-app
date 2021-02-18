@@ -27,7 +27,7 @@ export const snapshotToArray = (snapshot: any) => {
 interface IChat {
   roomname: string,
   username: string,
-  message: string,
+  text: string,
   date: string,
   type: string
 }
@@ -46,9 +46,9 @@ export class ChatroomComponent implements OnInit {
   chatForm!: FormGroup;
   username: string = '';
   roomname: string = '';
-  message: string = "";
+  text: string = "";
   users: any[] = [];
-  chats: any[] = [];
+  messages: IChat[] = [];
   matcher = new MyErrorStateMatcher();
 
   constructor(private router: Router,
@@ -57,14 +57,25 @@ export class ChatroomComponent implements OnInit {
     public datepipe: DatePipe) {
     this.username = localStorage.getItem('username') || "";
     this.roomname = this.route.snapshot.params.roomname;
-    firebase.database().ref('rooms').orderByChild('users').on('value', (resp: any) => {
-      this.users = snapshotToArray(resp) || [];
+    console.log("ENTER ROOM " + this.roomname)
+    firebase.database().ref('rooms').child(this.roomname).child("users").on('value', (resp: any) => {
+      const usersArray: any[] = [];
+      resp.forEach((childSnapshot: any) => {
+        if (childSnapshot.val() == true) {
+          usersArray.push(childSnapshot.key);
+        }
+      });
+      this.users = usersArray;
+    });
+    firebase.database().ref('rooms').child(this.roomname).child("messages").on('value', (resp: any) => {
+      this.messages = snapshotToArray(resp) || [];
+      console.log(this.messages);
     });
   }
 
   ngOnInit(): void {
     this.chatForm = this.formBuilder.group({
-      'message': [null, Validators.required]
+      'text': [null, Validators.required]
     });
   }
 
@@ -72,26 +83,27 @@ export class ChatroomComponent implements OnInit {
     const chat = form;
     chat.roomname = this.roomname;
     chat.username = this.username;
-    chat.date = this.datepipe.transform(new Date(), 'dd/MM/yyyy HH:mm:ss');
+    chat.date = this.datepipe.transform(new Date(), 'MM-dd-yyyy HH:mm:ss');
     chat.type = 'message';
-    const newMessage = firebase.database().ref('rooms').child("messages").push();
+    const newMessage = firebase.database().ref('rooms').child(this.roomname).child("messages").push();
+    console.log(chat);
     newMessage.set(chat);
     this.chatForm = this.formBuilder.group({
-      'message': [null, Validators.required]
+      'text': [null, Validators.required]
     });
   }
 
   exitChat() {
-    const chat: IChat = { roomname: '', username: '', message: '', date: '', type: '' };
+    const chat: IChat = { roomname: '', username: '', text: '', date: '', type: '' };
     chat.roomname = this.roomname;
     chat.username = this.username;
-    chat.date = this.datepipe.transform(new Date(), 'dd/MM/yyyy HH:mm:ss') || "";
-    chat.message = this.username + ' left the room';
+    chat.date = this.datepipe.transform(new Date(), 'MM-dd-yyyy HH:mm:ss') || "";
+    chat.text = this.username + ' left the room.';
     chat.type = 'exit';
-    const newMessage = firebase.database().ref('rooms').child("messages").push();
-    newMessage.set(chat);
-
-    this.router.navigate(['roomlist/']);
+    const room = firebase.database().ref('rooms').child(this.roomname);
+    room.child("messages").push(chat);
+    room.child("users").child(this.username).set(false);
+    this.router.navigate(['roomlist']);
   }
 
 }

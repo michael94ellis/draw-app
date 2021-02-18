@@ -44,11 +44,11 @@ export class AddroomComponent implements OnInit {
         this.snackBar.open('Room name already exist!');
       } else {
         console.log("Creating name room named: " + room.roomname);
-        const newRoom = firebase.database().ref('rooms').push();
-        newRoom.child("roomname").set(this.roomname);
+        const newRoom = firebase.database().ref('rooms').child(room.roomname);
         const username = localStorage.getItem('username');
         if (username != null && username != "") {
           newRoom.child("users").child(username).set(true);
+
           this.router.navigate(['/chatroom/' + room.roomname]);
         } else {
           this.router.navigate(['/roomlist/']);
