@@ -4,11 +4,11 @@
             <div class="users-pane">
                 <mat-card class="users-card">
                     <button type="button" mat-button matSuffix mat-icon-button aria-label="Exit" (click)="exitChat()">
-                        <mat-icon>logout</mat-icon>
+                        Exit Room
                     </button>
                 </mat-card>
                 <mat-card class="users-card" *ngFor="let user of users">
-                    <mat-icon>person</mat-icon> <span class="username">{{user.nickname}}</span>
+                    <mat-icon>person</mat-icon> <span class="username">{{user.username}}</span>
                 </mat-card>
             </div>
         </mat-drawer>
@@ -22,9 +22,9 @@
                     <ng-template #message>
                         <div class="chat-message">
                             <div class="right-bubble"
-                                [ngClass]="{'right-bubble': chat.nickname === nickname, 'left-bubble': chat.nickname !== nickname}">
-                                <span class="msg-name" *ngIf="chat.nickname === nickname">Me</span>
-                                <span class="msg-name" *ngIf="chat.nickname !== nickname">{{chat.nickname}}</span>
+                                [ngClass]="{'right-bubble': chat.username === username, 'left-bubble': chat.username !== username}">
+                                <span class="msg-name" *ngIf="chat.username === username">Me</span>
+                                <span class="msg-name" *ngIf="chat.username !== username">{{chat.username}}</span>
                                 <span class="msg-date"> at {{chat.date | date:'short'}}</span>
                                 <p text-wrap>{{ chat.message }}</p>
                             </div>

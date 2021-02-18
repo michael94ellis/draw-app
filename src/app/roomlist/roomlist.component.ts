@@ -22,13 +22,13 @@ export const snapshotToArray = (snapshot: any) => {
 })
 export class RoomlistComponent implements OnInit {
 
-  nickname = '';
+  username = '';
   displayedColumns: string[] = ['roomname'];
   rooms = [];
   isLoadingResults = true;
 
   constructor(private route: ActivatedRoute, private router: Router, public datepipe: DatePipe) {
-    this.nickname = localStorage.getItem('nickname') || "";
+    this.username = localStorage.getItem('username') || "";
     firebase.database().ref('rooms/').on('value', resp => {
       this.rooms = [];
       this.rooms = snapshotToArray(resp) as any;
@@ -40,37 +40,21 @@ export class RoomlistComponent implements OnInit {
   }
 
   enterChatRoom(roomname: string) {
-    const chat = { roomname: '', nickname: '', message: '', date: '', type: '' };
+    const chat = { roomname: '', username: '', message: '', date: '', type: '' };
     chat.roomname = roomname;
-    chat.nickname = this.nickname;
+    chat.username = this.username;
     chat.date = this.datepipe.transform(new Date(), 'dd/MM/yyyy HH:mm:ss') || "";
-    chat.message = '${this.nickname} enter the room';
+    chat.message = this.username + ' entered the room';
     chat.type = 'join';
-    const newMessage = firebase.database().ref('chats/').push();
-    newMessage.set(chat);
+    const room = firebase.database().ref('rooms').child(roomname)
 
-    firebase.database().ref('roomusers/').orderByChild('roomname').equalTo(roomname).on('value', (resp: any) => {
-      let roomuser = [];
-      roomuser = snapshotToArray(resp);
-      const user = roomuser.find(x => x.nickname === this.nickname);
-      if (user !== undefined) {
-        const userRef = firebase.database().ref('roomusers/' + user.key);
-        userRef.update({ status: 'online' });
-      } else {
-        const newroomuser = { roomname: '', nickname: '', status: '' };
-        newroomuser.roomname = roomname;
-        newroomuser.nickname = this.nickname;
-        newroomuser.status = 'online';
-        const newRoomUser = firebase.database().ref('roomusers/').push();
-        newRoomUser.set(newroomuser);
-      }
-    });
+    room.push(chat);
 
-    this.router.navigate(['/chatroom/${this.nickname}/', roomname]);
+    this.router.navigate(['/chatroom/${roomname}']);
   }
 
   logout(): void {
-    localStorage.removeItem('nickname');
+    localStorage.removeItem('username');
     this.router.navigate(['/login']);
   }
 

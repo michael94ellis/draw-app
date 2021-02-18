@@ -7,9 +7,9 @@ import { RoomlistComponent } from './roomlist/roomlist.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'roomlist/:nickname', component: RoomlistComponent },
+  { path: 'roomlist', component: RoomlistComponent },
   { path: 'addroom', component: AddroomComponent },
-  { path: 'chatroom/:nickname/:roomid', component: ChatroomComponent },
+  { path: 'chatroom/:roomid', component: ChatroomComponent },
   {
     path: '',
     redirectTo: '/login',

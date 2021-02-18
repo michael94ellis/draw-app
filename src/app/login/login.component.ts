@@ -19,30 +19,30 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 export class LoginComponent implements OnInit {
 
   loginForm!: FormGroup;
-  nickname = '';
+  username = '';
   ref = firebase.database().ref('users/');
   matcher = new MyErrorStateMatcher();
 
   constructor(private router: Router, private formBuilder: FormBuilder) { }
 
   ngOnInit() {
-    if (localStorage.getItem('nickname')) {
+    if (localStorage.getItem('username')) {
       this.router.navigate(['/roomlist']);
     }
     this.loginForm = this.formBuilder.group({
-      'nickname': [null, Validators.required]
+      'username': [null, Validators.required]
     });
   }
 
   onFormSubmit(form: any) {
     const login = form;
-    this.ref.orderByChild('nickname').equalTo(login.nickname).once('value', snapshot => {
+    this.ref.orderByChild('username').equalTo(login.username).once('value', snapshot => {
       if (!snapshot.exists()) {
         const newUser = firebase.database().ref('users/').push();
         newUser.set(login);
       }
-      localStorage.setItem('nickname', login.nickname);
-      this.router.navigate(['/roomlist/${nickname}']);
+      localStorage.setItem('username', login.username);
+      this.router.navigate(['/roomlist/']);
     });
   }
 
