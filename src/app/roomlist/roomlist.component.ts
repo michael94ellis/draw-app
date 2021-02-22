@@ -15,6 +15,11 @@ export const snapshotToArray = (snapshot: any) => {
   return returnArr;
 };
 
+interface IRoom {
+  name: string,
+  users: number
+}
+
 @Component({
   selector: 'app-roomlist',
   templateUrl: './roomlist.component.html',
@@ -23,15 +28,18 @@ export const snapshotToArray = (snapshot: any) => {
 export class RoomlistComponent implements OnInit {
 
   username = '';
-  displayedColumns: string[] = ['roomname'];
-  rooms = [];
+  displayedColumns: string[] = ['roomname', 'users'];
+  rooms: IRoom[] = [];
   isLoadingResults = true;
 
   constructor(private route: ActivatedRoute, private router: Router, public datepipe: DatePipe) {
     this.username = localStorage.getItem('username') || "";
     firebase.database().ref('rooms').on('value', resp => {
       this.rooms = [];
-      this.rooms = snapshotToArray(resp) as any;
+      snapshotToArray(resp).forEach(room => {
+        let newRoom: IRoom = { name: room.key, users: Object.keys(room.users).length };
+        this.rooms.push(newRoom);
+      });
       this.isLoadingResults = false;
     });
   }
