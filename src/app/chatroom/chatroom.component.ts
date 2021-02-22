@@ -34,6 +34,7 @@ interface IChat {
 
 @Component({
   selector: 'app-chatroom',
+  host: { 'window:beforeunload': 'exitChat' },
   templateUrl: './chatroom.component.html',
   styleUrls: ['./chatroom.component.scss']
 })
@@ -102,7 +103,7 @@ export class ChatroomComponent implements OnInit {
     chat.type = 'exit';
     const room = firebase.database().ref('rooms').child(this.roomname);
     room.child("messages").push(chat);
-    room.child("users").child(this.username).set(false);
+    room.child("users").child(this.username).remove();
     this.router.navigate(['roomlist']);
   }
 

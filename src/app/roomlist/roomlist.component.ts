@@ -37,8 +37,12 @@ export class RoomlistComponent implements OnInit {
     firebase.database().ref('rooms').on('value', resp => {
       this.rooms = [];
       snapshotToArray(resp).forEach(room => {
-        let newRoom: IRoom = { name: room.key, users: Object.keys(room.users).length };
-        this.rooms.push(newRoom);
+        if (room.users != null) {
+          let newRoom: IRoom = { name: room.key, users: Object.keys(room.users).length };
+          this.rooms.push(newRoom);
+        } else {
+          // empty room
+        }
       });
       this.isLoadingResults = false;
     });
