@@ -34,7 +34,7 @@ interface IChat {
 
 @Component({
   selector: 'app-chatroom',
-  host: { 'window:beforeunload': 'exitChat' },
+  host: { 'window:unload': 'exitChat' },
   templateUrl: './chatroom.component.html',
   styleUrls: ['./chatroom.component.scss']
 })
@@ -47,6 +47,7 @@ export class ChatroomComponent implements OnInit {
   chatForm!: FormGroup;
   username: string = '';
   roomname: string = '';
+  owner: string = '';
   text: string = "";
   users: any[] = [];
   messages: IChat[] = [];
@@ -59,7 +60,8 @@ export class ChatroomComponent implements OnInit {
     this.username = localStorage.getItem('username') || "";
     this.roomname = this.route.snapshot.params.roomname;
     console.log("ENTER ROOM " + this.roomname)
-    firebase.database().ref('rooms').child(this.roomname).child("users").on('value', (resp: any) => {
+    let chatroomRef = firebase.database().ref('rooms').child(this.roomname);
+    chatroomRef.child("users").on('value', (resp: any) => {
       const usersArray: any[] = [];
       resp.forEach((childSnapshot: any) => {
         if (childSnapshot.val() == true) {
@@ -68,9 +70,11 @@ export class ChatroomComponent implements OnInit {
       });
       this.users = usersArray;
     });
-    firebase.database().ref('rooms').child(this.roomname).child("messages").on('value', (resp: any) => {
+    chatroomRef.child("messages").on('value', (resp: any) => {
       this.messages = snapshotToArray(resp) || [];
-      console.log(this.messages);
+    });
+    chatroomRef.child("owner").on('value', (resp: any) => {
+      this.owner = resp.val();
     });
   }
 
@@ -87,7 +91,6 @@ export class ChatroomComponent implements OnInit {
     chat.date = this.datepipe.transform(new Date(), 'MM-dd-yyyy HH:mm:ss');
     chat.type = 'message';
     const newMessage = firebase.database().ref('rooms').child(this.roomname).child("messages").push();
-    console.log(chat);
     newMessage.set(chat);
     this.chatForm = this.formBuilder.group({
       'text': [null, Validators.required]

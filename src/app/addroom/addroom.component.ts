@@ -48,7 +48,7 @@ export class AddroomComponent implements OnInit {
         const username = localStorage.getItem('username');
         if (username != null && username != "") {
           newRoom.child("users").child(username).set(true);
-
+          newRoom.child("owner").set(username);
           this.router.navigate(['/chatroom/' + room.roomname]);
         } else {
           this.router.navigate(['/roomlist/']);

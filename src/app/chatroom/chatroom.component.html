@@ -8,7 +8,8 @@
                     </button>
                 </mat-card>
                 <mat-card class="users-card" *ngFor="let user of users">
-                    <mat-icon>person</mat-icon> <span class="username">{{user}}</span>
+                    <mat-icon *ngIf="user == owner">engineering</mat-icon>
+                    <mat-icon *ngIf="user != owner">person</mat-icon> <span class="username">{{user}}</span>
                 </mat-card>
             </div>
         </mat-drawer>
