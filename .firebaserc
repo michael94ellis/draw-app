@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "drawer-7798a"
+  },
+  "targets": {
+    "drawer-7798a": {
+      "hosting": {
+        "draw-app": [
+          "drawer-7798a"
+        ]
+      }
+    }
+  }
+}
