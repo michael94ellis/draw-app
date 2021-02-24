@@ -17,7 +17,8 @@ export const snapshotToArray = (snapshot: any) => {
 
 interface IRoom {
   name: string,
-  users: number
+  users: number,
+  roomkey: string
 }
 
 @Component({
@@ -38,10 +39,10 @@ export class RoomlistComponent implements OnInit {
       this.rooms = [];
       snapshotToArray(resp).forEach(room => {
         if (room.users != null) {
-          let newRoom: IRoom = { name: room.key, users: Object.keys(room.users).length };
+          let newRoom: IRoom = { name: room.name, users: Object.keys(room.users).length, roomkey: room.key };
           this.rooms.push(newRoom);
         } else {
-          // empty room
+          // empty room 
         }
       });
       this.isLoadingResults = false;
@@ -51,18 +52,17 @@ export class RoomlistComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  enterChatRoom(roomname: string) {
-    const chat = { roomname: '', username: '', text: '', date: '', type: '' };
-    chat.roomname = roomname;
+  enterChatRoom(selectedRoom: IRoom) {
+    const chat = { username: '', text: '', date: '', type: '' };
     chat.username = this.username;
     chat.date = this.datepipe.transform(new Date(), 'MM-dd-yyyy HH:mm:ss') || "";
     chat.text = this.username + ' entered the room';
     chat.type = 'join';
-    const room = firebase.database().ref('rooms').child(roomname);
+    const room = firebase.database().ref('rooms').child(selectedRoom.roomkey)
     room.child("messages").push(chat);
     room.child("users").child(this.username).set(true);
 
-    this.router.navigate(['/chatroom/' + roomname]);
+    this.router.navigate(['/chatroom/' + selectedRoom.roomkey]);
   }
 
   logout(): void {

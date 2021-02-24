@@ -31,7 +31,7 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="enterChatRoom(row.name)"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="enterChatRoom(row)"></tr>
         </table>
     </div>
 </div>
