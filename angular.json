@@ -128,11 +128,6 @@
               "devServerTarget": "draw-app:serve:production"
             }
           }
-        },
-        "deploy": {
-          "baseHref": "draw-app",
-          "builder": "angular-cli-ghpages:deploy",
-          "options": {}
         }
       }
     }
