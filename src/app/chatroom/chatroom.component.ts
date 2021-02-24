@@ -71,7 +71,7 @@ export class ChatroomComponent implements OnInit {
     });
     chatroomRef.child("messages").on('value', (resp: any) => {
       this.messages = snapshotToArray(resp) || [];
-      this.scrollToBottom();
+      setTimeout(() => this.chatcontent.nativeElement.scrollTop = this.chatcontent.nativeElement.scrollHeight);
     });
     chatroomRef.child("owner").on('value', (resp: any) => {
       this.owner = resp.val();
@@ -101,10 +101,6 @@ export class ChatroomComponent implements OnInit {
     const position = this.chatcontent.nativeElement.scrollTop + this.chatcontent.nativeElement.offsetHeight;
     const height = this.chatcontent.nativeElement.scrollHeight;
     return position > height - threshold;
-  }
-
-  private scrollToBottom(): void {
-    this.chatcontent.nativeElement.scrollTop = this.chatcontent.nativeElement.scrollHeight;
   }
 
   exitChat() {
