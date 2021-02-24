@@ -41,7 +41,6 @@ export class ChatroomComponent implements OnInit {
 
   @ViewChild('chatcontent')
   chatcontent!: ElementRef;
-  scrolltop: number = 0;
 
   chatForm!: FormGroup;
   username: string = '';
@@ -51,6 +50,7 @@ export class ChatroomComponent implements OnInit {
   users: any[] = [];
   messages: IChat[] = [];
   matcher = new MyErrorStateMatcher();
+  private isNearBottom = true;
 
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -71,6 +71,7 @@ export class ChatroomComponent implements OnInit {
     });
     chatroomRef.child("messages").on('value', (resp: any) => {
       this.messages = snapshotToArray(resp) || [];
+      this.scrollToBottom();
     });
     chatroomRef.child("owner").on('value', (resp: any) => {
       this.owner = resp.val();
@@ -93,6 +94,17 @@ export class ChatroomComponent implements OnInit {
     this.chatForm = this.formBuilder.group({
       'text': [null, Validators.required]
     });
+  }
+
+  private isUserNearBottom(): boolean {
+    const threshold = 150;
+    const position = this.chatcontent.nativeElement.scrollTop + this.chatcontent.nativeElement.offsetHeight;
+    const height = this.chatcontent.nativeElement.scrollHeight;
+    return position > height - threshold;
+  }
+
+  private scrollToBottom(): void {
+    this.chatcontent.nativeElement.scrollTop = this.chatcontent.nativeElement.scrollHeight;
   }
 
   exitChat() {
