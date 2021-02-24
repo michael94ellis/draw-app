@@ -27,7 +27,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     LoginComponent,
     RoomlistComponent,
     AddroomComponent,
-    ChatroomComponent
+    ChatroomComponent,
   ],
   imports: [
     BrowserModule,
