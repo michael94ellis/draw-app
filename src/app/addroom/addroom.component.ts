@@ -22,7 +22,6 @@ export class AddroomComponent implements OnInit {
   roomForm!: FormGroup;
   nickname = '';
   roomname = '';
-  ref = firebase.database().ref('rooms/');
   matcher = new MyErrorStateMatcher();
 
   constructor(private router: Router,
@@ -39,22 +38,17 @@ export class AddroomComponent implements OnInit {
 
   onFormSubmit(form: any) {
     const room = form;
-    this.ref.orderByChild('roomname').equalTo(room.roomname).once('value', (snapshot: any) => {
-      if (snapshot.exists()) {
-        this.snackBar.open('Room name already exist!');
+      console.log("Creating name room named: " + room.roomname);
+      const newRoom = firebase.database().ref('rooms').push();
+      newRoom.child('name').set(room.roomname);
+      const username = localStorage.getItem('username');
+      if (username != null && username != "") {
+        newRoom.child("users").child(username).set(true);
+        newRoom.child("owner").set(username);
+        this.router.navigate(['/chatroom/' + newRoom.key]);
       } else {
-        console.log("Creating name room named: " + room.roomname);
-        const newRoom = firebase.database().ref('rooms').child(room.roomname);
-        const username = localStorage.getItem('username');
-        if (username != null && username != "") {
-          newRoom.child("users").child(username).set(true);
-          newRoom.child("owner").set(username);
-          this.router.navigate(['/chatroom/' + room.roomname]);
-        } else {
-          this.router.navigate(['/roomlist/']);
-        }
+        this.router.navigate(['/roomlist/']);
       }
-    });
   }
 
 }

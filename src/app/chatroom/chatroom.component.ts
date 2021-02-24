@@ -25,7 +25,6 @@ export const snapshotToArray = (snapshot: any) => {
 };
 
 interface IChat {
-  roomname: string,
   username: string,
   text: string,
   date: string,
@@ -46,7 +45,7 @@ export class ChatroomComponent implements OnInit {
 
   chatForm!: FormGroup;
   username: string = '';
-  roomname: string = '';
+  roomkey: string = '';
   owner: string = '';
   text: string = "";
   users: any[] = [];
@@ -58,9 +57,9 @@ export class ChatroomComponent implements OnInit {
     private formBuilder: FormBuilder,
     public datepipe: DatePipe) {
     this.username = localStorage.getItem('username') || "";
-    this.roomname = this.route.snapshot.params.roomname;
-    console.log("ENTER ROOM " + this.roomname)
-    let chatroomRef = firebase.database().ref('rooms').child(this.roomname);
+    this.roomkey = this.route.snapshot.params.roomkey;
+    console.log("ENTER ROOM " + this.roomkey)
+    let chatroomRef = firebase.database().ref('rooms').child(this.roomkey);
     chatroomRef.child("users").on('value', (resp: any) => {
       const usersArray: any[] = [];
       resp.forEach((childSnapshot: any) => {
@@ -86,11 +85,10 @@ export class ChatroomComponent implements OnInit {
 
   onFormSubmit(form: any) {
     const chat = form;
-    chat.roomname = this.roomname;
     chat.username = this.username;
     chat.date = this.datepipe.transform(new Date(), 'MM-dd-yyyy HH:mm:ss');
     chat.type = 'message';
-    const newMessage = firebase.database().ref('rooms').child(this.roomname).child("messages").push();
+    const newMessage = firebase.database().ref('rooms').child(this.roomkey).child("messages").push();
     newMessage.set(chat);
     this.chatForm = this.formBuilder.group({
       'text': [null, Validators.required]
@@ -98,13 +96,12 @@ export class ChatroomComponent implements OnInit {
   }
 
   exitChat() {
-    const chat: IChat = { roomname: '', username: '', text: '', date: '', type: '' };
-    chat.roomname = this.roomname;
+    const chat: IChat = { username: '', text: '', date: '', type: '' };
     chat.username = this.username;
     chat.date = this.datepipe.transform(new Date(), 'MM-dd-yyyy HH:mm:ss') || "";
     chat.text = this.username + ' left the room.';
     chat.type = 'exit';
-    const room = firebase.database().ref('rooms').child(this.roomname);
+    const room = firebase.database().ref('rooms').child(this.roomkey);
     room.child("messages").push(chat);
     room.child("users").child(this.username).remove();
     this.router.navigate(['roomlist']);
